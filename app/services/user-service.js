@@ -25,25 +25,26 @@ const createToken = (payload) => {
   return jwt.sign(payload, "secret");
 }
 
-const getUsers = async (req, res) => {
+const getUsers = async () => {
   try {
     const users = await userRepository.getUsers();
-    const filteredUserData = users
-      .filter((user) => user.role !== "Superadmin")
+    const userData = await users
       .map((user) => {
         return {
           id: user?.id,
           name: user?.name,
           email: user?.email,
           role: user?.role,
-          created_at: user?.created_at,
-          updated_at: user?.updated_at
         }
       });
+    const totalUser = await userRepository.getTotalUser();
     
-    return filteredUserData
+    return {
+      totalUser,
+      data: userData
+    };
   } catch (error) {
-    
+    throw new Error("Failed get car data.");
   }
 }
 
@@ -56,19 +57,61 @@ const register = async (requestBody) => {
   const isUserExist = await userRepository.getUserByEmail(email);
   if (isUserExist) {
     return {
-      status_code: "409",
-      status: "Error",
+      status_code: 409,
       message: "Email already exists.",
     }
   }
 
   const encryptedPassword = await encryptPassword(password);
-  return userRepository.createUser({ 
+  const user = await userRepository.createUser({ 
     name, 
     email, 
     password: encryptedPassword,
     role: "Member"
   });
+
+  return {
+    message: "Congrats, your account has been successfully created.",
+    data: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    }
+  }
+}
+
+const registerAdmin = async (requestBody) => {
+  const { name, email, password } = requestBody;
+  if (!name || !email || !password) {
+    throw new Error("Name, email, and password are required");
+  }
+
+  const isUserExist = await userRepository.getUserByEmail(email);
+  if (isUserExist) {
+    return {
+      status_code: 409,
+      message: "Email already exists.",
+    }
+  }
+
+  const encryptedPassword = await encryptPassword(password);
+  const user = await userRepository.createUser({ 
+    name, 
+    email, 
+    password: encryptedPassword,
+    role: "Admin"
+  });
+
+  return {
+    message: "Congrats, your account has been successfully created.",
+    data: {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    }
+  }
 }
 
 const login = async (requestBody) => {
@@ -80,8 +123,7 @@ const login = async (requestBody) => {
   const user = await userRepository.getUserByEmail(email);
   if (!user) {
     return {
-      status_code: "401",
-      status: "Error",
+      status_code: 401,
       message: "Invalid email or password.",
     }
   }
@@ -90,8 +132,7 @@ const login = async (requestBody) => {
   console.log(isPasswordCorrect)
   if (!isPasswordCorrect) {
     return {
-      status_code: "401",
-      status: "Error",
+      status_code: 401,
       message: "Invalid email or password.",
     }
   }
@@ -106,34 +147,9 @@ const login = async (requestBody) => {
   user.token = token;
   
   return {
-    status: "Success",
     message: "Kamu telah berhasil login.",
     data: user
   }
-}
-
-const registerAdmin = async (requestBody) => {
-  const { name, email, password } = requestBody;
-  if (!name || !email || !password) {
-    throw new Error("Name, email, and password are required");
-  }
-
-  const isUserExist = await userRepository.getUserByEmail(email);
-  if (isUserExist) {
-    return {
-      status_code: "409",
-      status: "Error",
-      message: "Email already exists.",
-    }
-  }
-
-  const encryptedPassword = await encryptPassword(password);
-  return userRepository.createUser({ 
-    name, 
-    email, 
-    password: encryptedPassword,
-    role: "Admin"
-  });
 }
 
 module.exports = {

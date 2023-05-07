@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const userService = require("../../../services/user-service");
+const userService = require("../../../services/user-service.js");
 
 const authorize = async (req, res, next) => {
   try {
@@ -57,15 +57,19 @@ const authorizeAdmin = async (req, res, next) => {
 const getUsers = async (req, res) => {
   try {
     const users = await userService.getUsers();
+    console.log(users);
     res.status(200).json({
       status: "Success",
-      data: users
-    })
+      data: {
+        count: users.totalUser,
+        users: users.data
+      }
+    });
   } catch (error) {
-    res.status(404).json({
+    res.status(400).json({
       status: "Error",
       message: error.message
-    })
+    });
   }
 }
 
@@ -85,9 +89,10 @@ const whoAmI = (req, res) => {
 const register = async (req, res) => {
   try {
     const user = await userService.register(req.body);    
-    if (user.status === "Error") {
+    
+    if (!user.data) {
       res.status(user.status_code).json({
-        status: user.status,
+        status: "Error",
         message: user.message
       });
       return;
@@ -95,15 +100,16 @@ const register = async (req, res) => {
     
     res.status(201).json({
       status: "Success",
-      message: "Congrats, your account has been successfully created.",
+      message: user.message,
       data: {
-        name: user.name,
-        email: user.email,
-        role: user.role
+        id: user.data.id,
+        name: user.data.name,
+        email: user.data.email,
+        role: user.data.role,
       },
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(422).json({
       status: "Error",
       message: error.message
     });
@@ -114,9 +120,9 @@ const registerAdmin = async (req, res) => {
   try {
     const user = await userService.registerAdmin(req.body);    
 
-    if (user.status === "Error") {
+    if (!user.data) {
       res.status(user.status_code).json({
-        status: user.status,
+        status: "Error",
         message: user.message
       });
       return;
@@ -124,15 +130,16 @@ const registerAdmin = async (req, res) => {
     
     res.status(201).json({
       status: "Success",
-      message: "Congrats, your account has been successfully created.",
+      message: user.message,
       data: {
-        name: user.name,
-        email: user.email,
-        role: user.role
+        id: user.data.id,
+        name: user.data.name,
+        email: user.data.email,
+        role: user.data.role,
       },
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(422).json({
       status: "Error",
       message: error.message
     });
@@ -145,14 +152,14 @@ const login = async (req, res) => {
 
     if (!user.data) {
       res.status(user.status_code).json({
-        status: user.status,
+        status: "Error",
         message: user.message
       });
       return;
     }
     
     res.status(201).json({
-      status: user.status,
+      status: "Success",
       message: user.message,
       data: {
         id: user.data.id,
@@ -163,7 +170,7 @@ const login = async (req, res) => {
       }
     });
   } catch (error) {
-    res.status(400).json({
+    res.status(422).json({
       status: "Error",
       message: error.message
     });

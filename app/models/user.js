@@ -9,15 +9,15 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       this.hasMany(models.Car, {
-        foreignKey: "created_by",
+        foreignKey: "createdBy",
         as: "created"
       });
       this.hasMany(models.Car, {
-        foreignKey: "updated_by",
+        foreignKey: "updatedBy",
         as: "updated"
       });
       this.hasMany(models.Car, {
-        foreignKey: "deleted_by",
+        foreignKey: "deletedBy",
         as: "deleted"
       });
     }

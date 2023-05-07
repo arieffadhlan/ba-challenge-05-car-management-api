@@ -28,7 +28,27 @@ router.post("/api/v1/register/admin",
 router.post("/api/v1/login", controllers.userController.login);
 
 // Car
-
+router.get("/api/v1/cars", 
+  controllers.userController.authorize,
+  controllers.carController.getCars
+);
+router.get("/cars/:id", controllers.carController.getCar);
+// router.post("/cars", 
+//   middlewares.imageValidation, 
+//   middlewares.cloudinaryUpload, 
+//   controllers.carController.addCar
+// );
+// router.put("/cars/:id", 
+//   middlewares.isCarExists, 
+//   middlewares.imageValidation, 
+//   middlewares.cloudinaryUpload, 
+//   controllers.carController.updateCar
+// );
+// router.delete("/cars/:id", 
+//   middlewares.isCarExists, 
+//   middlewares.cloudinaryDelete, 
+//   controllers.carController.deleteCar
+// );
 
 
 module.exports = router;
