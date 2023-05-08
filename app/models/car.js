@@ -52,9 +52,12 @@ module.exports = (sequelize, DataTypes) => {
         key: "id"
       }
     },
+    deletedAt: DataTypes.DATE,
   }, {
     sequelize,
     modelName: 'Car',
+    paranoid: true,
+    timestamps: true,
   });
   return Car;
 };

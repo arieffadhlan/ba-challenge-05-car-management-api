@@ -40,7 +40,7 @@ module.exports = {
 				},
 			},
 			updatedBy: {
-				allowNull: false,
+				allowNull: true,
 				type: Sequelize.INTEGER,
 				references: {
 					model: {
@@ -50,7 +50,7 @@ module.exports = {
 				},
 			},
 			deletedBy: {
-				allowNull: false,
+				allowNull: true,
 				type: Sequelize.INTEGER,
 				references: {
 					model: {
@@ -65,6 +65,10 @@ module.exports = {
       },
       updatedAt: {
         allowNull: false,
+        type: Sequelize.DATE
+      },
+      deletedAt: {
+        allowNull: true,
         type: Sequelize.DATE
       }
     });

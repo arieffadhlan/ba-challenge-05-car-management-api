@@ -12,25 +12,25 @@ const getCar = (id) => {
   return Car.findByPk(id);
 }
 
-const getCarByEmail = (email) => {
-  return Car.findOne({
-    where: { email }
-  });
-}
-
 const createCar = (createArgs) => {
   return Car.create(createArgs);
 }
 
+const updateCar = (id, updateArgs) => {
+  return Car.update(updateArgs, 
+    { where: { id } 
+  });
+}
+
 const deleteCar = (id) => {
-  return Car.destroy(id);
+  return Car.destroy({ where: { id } });
 }
 
 module.exports = {
   getTotalCar,
   getCars,
   getCar,
-  getCarByEmail,
   createCar,
+  updateCar,
   deleteCar
 };

@@ -2,6 +2,7 @@ const express = require("express");
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../docs/openapi.json');
 const controllers = require("../app/controllers/api/v1");
+const middlewares = require("../app/middlewares");
 
 const router = express.Router(); 
 
@@ -32,23 +33,32 @@ router.get("/api/v1/cars",
   controllers.userController.authorize,
   controllers.carController.getCars
 );
-router.get("/cars/:id", controllers.carController.getCar);
-// router.post("/cars", 
-//   middlewares.imageValidation, 
-//   middlewares.cloudinaryUpload, 
-//   controllers.carController.addCar
-// );
-// router.put("/cars/:id", 
-//   middlewares.isCarExists, 
-//   middlewares.imageValidation, 
-//   middlewares.cloudinaryUpload, 
-//   controllers.carController.updateCar
-// );
-// router.delete("/cars/:id", 
-//   middlewares.isCarExists, 
-//   middlewares.cloudinaryDelete, 
-//   controllers.carController.deleteCar
-// );
-
+router.get("/api/v1/cars/:id", 
+  controllers.userController.authorize,
+  controllers.carController.getCar
+);
+router.post("/api/v1/cars",
+  controllers.userController.authorize,
+  controllers.userController.authorizeAdmin,
+  middlewares.imageMiddleware.imageUploader, 
+  middlewares.cloudinaryMiddleware.cloudinaryUpload, 
+  controllers.carController.addCar
+);
+router.put("/api/v1/cars/:id", 
+  controllers.userController.authorize,
+  controllers.userController.authorizeAdmin,
+  middlewares.carMiddleware.isCarExists, 
+  middlewares.imageMiddleware.imageUploader, 
+  middlewares.cloudinaryMiddleware.cloudinaryUpload, 
+  controllers.carController.updateCar
+);
+router.delete("/api/v1/cars/:id", 
+  controllers.userController.authorize,
+  controllers.userController.authorizeAdmin,
+  middlewares.carMiddleware.isCarExists, 
+  middlewares.imageMiddleware.imageUploader, 
+  middlewares.cloudinaryMiddleware.cloudinaryDelete, 
+  controllers.carController.deleteCar
+);
 
 module.exports = router;

@@ -57,7 +57,6 @@ const authorizeAdmin = async (req, res, next) => {
 const getUsers = async (req, res) => {
   try {
     const users = await userService.getUsers();
-    console.log(users);
     res.status(200).json({
       status: "Success",
       data: {
