@@ -1,4 +1,4 @@
-const { Car } = require("../models");
+const { Car, User } = require("../models");
 
 const getTotalCar = () => {
   return Car.count();
@@ -9,7 +9,24 @@ const getCars = () => {
 }
 
 const getCar = (id) => {
-  return Car.findByPk(id);
+  return Car.findByPk(id, {
+    include: [
+      {
+        model: User,
+        as: "created",
+      },
+      {
+        model: User,
+        as: "updated",
+      },
+      {
+        model: User,
+        as: "deleted",
+      },
+    ],
+    attributes: { exclude: ["createdBy", "updatedBy", "deletedBy"] },
+    paranoid: false,
+  });
 }
 
 const createCar = (createArgs) => {

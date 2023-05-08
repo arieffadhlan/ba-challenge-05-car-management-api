@@ -5,7 +5,7 @@ const getCars = async () => {
     const cars = await carRepository.getCars();
     return cars;
   } catch (error) {
-    throw new Error(error);
+    throw new Error("Failed get car data.");
   }
 }
 
@@ -46,7 +46,7 @@ const getCar = async (id) => {
       }
     }
   } catch (error) {
-    throw new Error(error);
+    throw new Error("Failed get car data.");
   }
 }
 
@@ -55,7 +55,7 @@ const getCarById = async (id) => {
     const car = await carRepository.getCar(id);
     return car;
   } catch (error) {
-    throw new Error(error);
+    throw new Error("Failed get car data.");
   }
 }
 
@@ -78,7 +78,7 @@ const addCar = async (req) => {
   });
 
   return {
-    message: "Car has been successfully created.",
+    message: "Car has been created successfully.",
     data: {
       id: car.id,
       name: car.name, 
@@ -118,7 +118,7 @@ const deleteCar = async (req) => {
     await carRepository.updateCar(carId, { deletedBy: userId });
     return await carRepository.deleteCar(carId);
   } catch (error) {
-    throw new Error(error);
+    throw new Error("Failed delete car data.");
   }
 }
 

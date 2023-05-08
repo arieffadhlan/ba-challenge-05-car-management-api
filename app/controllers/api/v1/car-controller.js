@@ -33,7 +33,7 @@ const getCar = async (req, res) => {
       data: car.data
     });
   } catch (error) {
-    res.status(422).json({
+    res.status(400).json({
       status: "Error",
       message: error.message
     });
@@ -70,7 +70,7 @@ const updateCar = async (req, res) => {
     await carService.updateCar(req);
     res.status(200).json({
       status: "Success",
-      message: "Car has been successfully updated.",
+      message: "Car has been updated successfully.",
     });
   } catch (error) {
     res.status(422).json({
@@ -85,7 +85,7 @@ const deleteCar = async (req, res) => {
     await carService.deleteCar(req);
     res.status(200).json({
       status: "Success",
-      message: "Car has been successfully deleted.",
+      message: "Car has been deleted successfully.",
     });
   } catch (error) {
     res.status(422).json({

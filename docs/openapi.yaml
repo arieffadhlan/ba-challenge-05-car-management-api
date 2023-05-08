@@ -1,0 +1,969 @@
+openapi: 3.0.3
+info:
+  title: Binar Challenge 5 - Car Management API
+  version: "1.0.0"
+  description: "Following api is used to manage car data and user authentication. This API was created to fulfill the challenge chapter 5 of Binar Academy in the fullstack web development class.\n\n Author: Muhammad Arief Fadhlan"
+servers:
+  - url: http://localhost:8000/api/v1
+tags:
+  - name: Auth
+    description: User authentication.
+  - name: Users
+    description: Operation about user.
+  - name: Cars
+    description: Operation about car.
+paths:
+  /register:
+    post:
+      tags:
+        - Auth
+      summary: Register new user.
+      description: Register new user account with member role.
+      requestBody:
+        description: Required fields (name, email, password)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterCredentials"
+      responses:
+        "201":
+          description: Member account has been created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  message:
+                    type: string
+                    example: Account has been created successfully.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 1
+                      name:
+                        type: string
+                        example: Muhammad Arief Fadhlan
+                      email:
+                        type: string
+                        example: arief@gmail.com
+                      role:
+                        type: string
+                        enum:
+                          - Member
+                          - Admin
+                          - Superadmin
+                        example: Member
+        "409":
+          description: Conflict, email already exists or registered.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Email already exists.
+        "422":
+          description: Unprocessable Entity, check the data is valid and must be filled in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Name, email, and password are required.
+  /login:
+    post:
+      tags:
+        - Auth
+      summary: Login with user account.
+      description: Login and get token for authorization.
+      requestBody:
+        description: Required fields (email, password)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginCredentials"
+      responses:
+        "201":
+          description: The user has successfully logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  message:
+                    type: string
+                    example: Login has been successful.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 1
+                      name:
+                        type: string
+                        example: Muhammad Arief Fadhlan
+                      email:
+                        type: string
+                        example: arief@gmail.com
+                      role:
+                        type: string
+                        enum:
+                          - Member
+                          - Admin
+                          - Superadmin
+                        example: Member
+                      token:
+                        type: string
+                        example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwibmFtZSI6IlN1cGVyYWRtaW4iLCJlbWFpbCI6InN1cGVyYWRtaW5AZ21haWwuY29tIiwicm9sZSI6IlN1cGVyYWRtaW4iLCJpYXQiOjE2ODM0NzcwODZ9.ubGkTd9gET6OQ2E3fbhY5YQzN8eauJyRhLN-0kw8kXo
+        "401":
+          description: Unauthorize, invalid credentials.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Invalid email or password.
+        "422":
+          description: Unprocessable Entity, check the data is valid and must be filled in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Email and password are required.
+  /users:
+    get:
+      tags:
+        - Users
+      security:
+        - bearerToken: []
+      summary: Get all user information.
+      description: Get all user information, but it will not for superadmin.
+      responses:
+        "200":
+          description: User data has been retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  data:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          format: int64
+                          example: 1
+                        name:
+                          type: string
+                          example: Muhammad Arief Fadhlan
+                        email:
+                          type: string
+                          example: arief@gmail.com
+                        role:
+                          type: string
+                          enum:
+                            - Member
+                            - Admin
+                            - Superadmin
+                          example: Member
+                        createdAt:
+                          type: string
+                          example: "2023-05-07T16:31:18.828Z"
+                        updatedAt:
+                          type: string
+                          example: "2023-05-07T16:31:18.828Z"
+        "400":
+          description: Bad request, failed get user data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Failed get user data.
+        "401":
+          description: Unauthorize, user is not logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Unauthorize.
+        "403":
+          description: forbidden, user roles are not admin and superadmin.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: You dont have permission for this request.
+  /users/whoami:
+    get:
+      tags:
+        - Users
+      security:
+        - bearerToken: []
+      summary: Get current user information.
+      description: Get current user information.
+      responses:
+        "200":
+          description: The current user data has been retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  data:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          format: int64
+                          example: 1
+                        name:
+                          type: string
+                          example: Muhammad Arief Fadhlan
+                        email:
+                          type: string
+                          example: arief@gmail.com
+                        role:
+                          type: string
+                          enum:
+                            - Member
+                            - Admin
+                            - Superadmin
+                          example: Member
+        "401":
+          description: Unauthorize, user is not logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Unauthorize.
+  /register/admin:
+    post:
+      tags:
+        - Users
+      security:
+        - bearerToken: []
+      summary: Register new admin.
+      description: Register new user account with admin role.
+      requestBody:
+        description: Required fields (name, email, password)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterAdminCredentials"
+      responses:
+        "201":
+          description: Admin account has been created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  message:
+                    type: string
+                    example: Account has been created successfully.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 1
+                      name:
+                        type: string
+                        example: Muhammad Arief Fadhlan
+                      email:
+                        type: string
+                        example: arief@gmail.com
+                      role:
+                        type: string
+                        enum:
+                          - Member
+                          - Admin
+                          - Superadmin
+                        example: Member
+        "401":
+          description: Unauthorize, user is not logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Unauthorize.
+        "403":
+          description: forbidden, user roles is not superadmin.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: You dont have permission for this request.
+        "409":
+          description: Conflict, email already exists or registered.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Email already exists.
+        "422":
+          description: Unprocessable Entity, check the data is valid and must be filled in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Name, email, and password are required.
+  /cars:
+    get:
+      tags:
+        - Cars
+      security:
+        - bearerToken: []
+      summary: Get all car information.
+      description: Get all car information.
+      responses:
+        "200":
+          description: Car data has been retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  data:
+                    type: array
+                    items:
+                      properties:
+                        id:
+                          type: integer
+                          format: int64
+                          example: 1
+                        name:
+                          type: string
+                          example: Car
+                        rentPerDay:
+                          type: string
+                          example: "200000000"
+                        size:
+                          type: string
+                          example: Small
+                        image:
+                          type: string
+                          example: https://res.cloudinary.com/dinzzdsdo/image/upload/v1683483455/binar-challenge05/pzue0g703mesgoxigqvd.png
+                        available:
+                          type: boolean
+                          example: true
+                        createdBy:
+                          type: integer
+                          format: int64
+                          example: 1
+                        updatedBy:
+                          type: integer
+                          format: int64
+                          example: 1
+                        deletedBy:
+                          type: integer
+                          format: int64
+                          example: 1
+                        createdAt:
+                          type: string
+                          example: "2023-05-07T16:31:18.828Z"
+                        updatedAt:
+                          type: string
+                          example: "2023-05-07T16:31:18.828Z"
+        "400":
+          description: Bad request, failed get car data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Failed get car data.
+        "401":
+          description: Unauthorize, user is not logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Unauthorize.
+    post:
+      tags:
+        - Cars
+      security:
+        - bearerToken: []
+      summary: Add new car.
+      requestBody:
+        description: Required fields (name, rentPerDay, size, image, available)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCar"
+      responses:
+        "201":
+          description: New car has been created successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  message:
+                    type: string
+                    example: Car has been created successfully.
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 1
+                      name:
+                        type: string
+                        example: Car
+                      rentPerDay:
+                        type: string
+                        example: "200000000"
+                      size:
+                        type: string
+                        example: Small
+                      image:
+                        type: string
+                        example: https://res.cloudinary.com/dinzzdsdo/image/upload/v1683483455/binar-challenge05/pzue0g703mesgoxigqvd.png
+                      available:
+                        type: boolean
+                        example: true
+                      createdAt:
+                        type: string
+                        example: "2023-05-07T16:31:18.828Z"
+                      updatedAt:
+                        type: string
+                        example: "2023-05-07T16:31:18.828Z"
+        "401":
+          description: Unauthorize, user is not logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Unauthorize.
+        "403":
+          description: forbidden, user roles are not admin and superadmin.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: You dont have permission for this request.
+        "422":
+          description: Unprocessable Entity, check the data is valid and must be filled in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Name, rent per day, size, and available are required.
+  /cars/{id}:
+    get:
+      tags:
+        - Cars
+      security:
+        - bearerToken: []
+      summary: Get all car information.
+      description: Get all car information.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the car.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Car data has been retrieved successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        format: int64
+                        example: 1
+                      name:
+                        type: string
+                        example: Car
+                      rentPerDay:
+                        type: string
+                        example: "200000000"
+                      size:
+                        type: string
+                        example: Small
+                      image:
+                        type: string
+                        example: https://res.cloudinary.com/dinzzdsdo/image/upload/v1683483455/binar-challenge05/pzue0g703mesgoxigqvd.png
+                      available:
+                        type: boolean
+                        example: true
+                      createdBy:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: superadmin
+                          email:
+                            type: string
+                            example: superadmin@gmail.com
+                      updatedBy:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: superadmin
+                          email:
+                            type: string
+                            example: superadmin@gmail.com
+                      deletedBy:
+                        type: object
+                        properties:
+                          name:
+                            type: string
+                            example: superadmin
+                          email:
+                            type: string
+                            example: superadmin@gmail.com
+                      createdAt:
+                        type: string
+                        example: "2023-05-07T16:31:18.828Z"
+                      updatedAt:
+                        type: string
+                        example: "2023-05-07T16:31:18.828Z"
+        "400":
+          description: Bad request, failed get car data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Failed get car data.
+        "401":
+          description: Unauthorize, user is not logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Unauthorize.
+        '404':
+          description: Car data that has been searched not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Car not found.
+    put:
+      tags:
+        - Cars
+      security:
+        - bearerToken: []
+      summary: Update a car.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the car.
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Required fields (name, rentPerDay, size, image, available)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateCar"
+      responses:
+        "200":
+          description: Car has been updated successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  message:
+                    type: string
+                    example: Car has been updated successfully.
+        "401":
+          description: Unauthorize, user is not logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Unauthorize.
+        "403":
+          description: forbidden, user roles are not admin and superadmin.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: You dont have permission for this request.
+        '404':
+          description: Car data that has been searched not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Car not found.
+        "422":
+          description: Unprocessable Entity, check the data is valid and must be filled in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Name, rent per day, size, and available are required.
+    delete:
+      tags:
+        - Cars
+      security:
+        - bearerToken: []
+      summary: Delete a car.
+      parameters:
+        - name: id
+          in: path
+          description: ID of the car.
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Car has been deleted successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Success
+                  message:
+                    type: string
+                    example: Car has been deleted successfully.
+        "401":
+          description: Unauthorize, user is not logged in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Unauthorize.
+        "403":
+          description: forbidden, user roles are not admin and superadmin.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: You dont have permission for this request.
+        '404':
+          description: Car data that has been searched not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Car not found.
+        "422":
+          description: Unprocessable Entity, check the data is valid and must be filled in.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: Error
+                  message:
+                    type: string
+                    example: Failed delete car data.
+                
+components:
+  schemas:
+    RegisterCredentials:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          example: Muhammad Arief Fadhlan
+        email:
+          type: string
+          example: arief@gmail.com
+        password:
+          type: string
+          example: arief_pass
+    RegisterAdminCredentials:
+      type: object
+      required:
+        - name
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          example: Admin2
+        email:
+          type: string
+          example: admin2@gmail.com
+        password:
+          type: string
+          example: admin2_pass
+    LoginCredentials:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          example: arief@gmail.com
+        password:
+          type: string
+          example: arief_pass
+    CreateCar:
+      type: object
+      required:
+        - name
+        - rentPerDay
+        - size
+        - image
+        - available
+      properties:
+        name:
+          type: string
+          example: Car
+        rentPerDay:
+          type: string
+          example: "200000000"
+        size:
+          type: string
+          example: Small
+        image:
+          type: string
+          example: https://res.cloudinary.com/dinzzdsdo/image/upload/v1683483455/binar-challenge05/pzue0g703mesgoxigqvd.png
+        available:
+          type: boolean
+          example: true
+    UpdateCar:
+      type: object
+      required:
+        - name
+        - rentPerDay
+        - size
+        - image
+        - available
+      properties:
+        name:
+          type: string
+          example: Car Updated
+        rentPerDay:
+          type: string
+          example: "300000000"
+        size:
+          type: string
+          example: Large
+        image:
+          type: string
+          example: https://res.cloudinary.com/dinzzdsdo/image/upload/v1683483455/binar-challenge05/pzue0g703mesgoxigqvd.png
+        available:
+          type: boolean
+          example: true
+  securitySchemes:
+    bearerToken:
+      description: 'Note: Token required, you may to login first then paste token code here'
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

@@ -28,30 +28,29 @@ const createToken = (payload) => {
 const getUsers = async () => {
   try {
     const users = await userRepository.getUsers();
-    const userData = await users
+    const filteredUserData = await users
+      .filter((user) => user?.role !== "Superadmin")
       .map((user) => {
         return {
           id: user?.id,
           name: user?.name,
           email: user?.email,
           role: user?.role,
+          createdAt: user?.createdAt,
+          updatedAt: user?.updatedAt
         }
       });
-    const totalUser = await userRepository.getTotalUser();
     
-    return {
-      totalUser,
-      data: userData
-    };
+    return filteredUserData;
   } catch (error) {
-    throw new Error("Failed get car data.");
+    throw new Error("Failed get user data.");
   }
 }
 
 const register = async (requestBody) => {
   const { name, email, password } = requestBody;
   if (!name || !email || !password) {
-    throw new Error("Name, email, and password are required");
+    throw new Error("Name, email, and password are required.");
   }
 
   const isUserExist = await userRepository.getUserByEmail(email);
@@ -71,7 +70,7 @@ const register = async (requestBody) => {
   });
 
   return {
-    message: "Congrats, your account has been successfully created.",
+    message: "Account has been created successfully.",
     data: {
       id: user.id,
       name: user.name,
@@ -104,7 +103,7 @@ const registerAdmin = async (requestBody) => {
   });
 
   return {
-    message: "Congrats, your account has been successfully created.",
+    message: "Account has been created successfully.",
     data: {
       id: user.id,
       name: user.name,
@@ -117,7 +116,7 @@ const registerAdmin = async (requestBody) => {
 const login = async (requestBody) => {
   const { email, password } = requestBody;
   if (!email || !password) {
-    throw new Error("Email and password are required");
+    throw new Error("Email and password are required.");
   }
   
   const user = await userRepository.getUserByEmail(email);
@@ -147,7 +146,7 @@ const login = async (requestBody) => {
   user.token = token;
   
   return {
-    message: "Kamu telah berhasil login.",
+    message: "Login has been successful.",
     data: user
   }
 }

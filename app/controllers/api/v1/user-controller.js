@@ -1,68 +1,11 @@
-const jwt = require("jsonwebtoken");
 const userService = require("../../../services/user-service.js");
-
-const authorize = async (req, res, next) => {
-  try {
-    const bearerToken = req.headers.authorization;
-    const token = bearerToken.split("Bearer ")[1];
-    const tokenPayload = jwt.verify(token, "secret");
-
-    req.user = tokenPayload;
-    next();
-  } catch (err) {
-    res.status(401).json({
-      message: "Unauthorize"
-    });
-  }
-}
-
-const authorizeSuperadmin = async (req, res, next) => {
-  try {
-    const { role } = req.user;
-
-    if (role !== "Superadmin") {
-      return res.status(403).json({
-        status: "Error",
-        message: "You dont have permission for this request."
-      });
-    }
-    
-    next();
-  } catch (error) {
-    res.status(401).json({
-      message: "Unauthorize"
-    });
-  }
-}
-
-const authorizeAdmin = async (req, res, next) => {
-  try {
-    const { role } = req.user;
-    
-    if (role !== "Superadmin" && role !== "Admin") {
-      return res.status(403).json({
-        status: "Error",
-        message: "You dont have permission for this request."
-      });
-    }
-    
-    next();
-  } catch (error) {
-    res.status(401).json({
-      message: "Unauthorize"
-    });
-  }
-}
 
 const getUsers = async (req, res) => {
   try {
     const users = await userService.getUsers();
     res.status(200).json({
       status: "Success",
-      data: {
-        count: users.totalUser,
-        users: users.data
-      }
+      data: users
     });
   } catch (error) {
     res.status(400).json({
@@ -177,9 +120,6 @@ const login = async (req, res) => {
 }
 
 module.exports = {
-  authorize,
-  authorizeSuperadmin,
-  authorizeAdmin,
   getUsers,
   whoAmI,
   register,
