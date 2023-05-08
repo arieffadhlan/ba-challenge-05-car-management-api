@@ -13,4 +13,4 @@ Repository ini dibuat untuk memenuhi challenge chapter 5 dari Studi Independen B
 
 ## API Documentation
 
-- http://localhost:8000
+- http://localhost:8000/api-docs

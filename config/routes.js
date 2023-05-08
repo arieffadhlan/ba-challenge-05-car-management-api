@@ -7,8 +7,8 @@ const middlewares = require("../app/middlewares");
 const router = express.Router(); 
 
 // Swagger UI Documentation
-router.use("/", swaggerUi.serve);
-router.get("/", swaggerUi.setup(swaggerDocument));
+router.use("/api-docs", swaggerUi.serve);
+router.get("/api-docs", swaggerUi.setup(swaggerDocument));
 
 // User
 router.get("/api/v1/users",
@@ -60,5 +60,12 @@ router.delete("/api/v1/cars/:id",
   middlewares.cloudinaryMiddleware.cloudinaryDelete, 
   controllers.carController.deleteCar
 );
+
+router.use((req, res) => {
+  res.status(404).json({
+    status: "Error",
+    message: "Route not found.",
+  });
+});
 
 module.exports = router;
